@@ -6,6 +6,7 @@ import csv
 import numpy as np
 import pandas as pd
 import os
+import re
 import sys
 from datetime import datetime
 
@@ -15,27 +16,31 @@ def main(args):
     target_ingredients = pd.read_csv(args[1])
     excluded_ingredients = pd.read_csv(args[2])
 
-    target_ingredients['products'] = target_ingredients.iloc[0].str.lower()
-    excluded_ingredients['products'] = excluded_ingredients.iloc[0].str.lower()
-    food_brands['ingredients'] = food_brands['ingredients'].str.lower()
+    print(target_ingredients)
+
+    #target_ingredients['products'] = target_ingredients.iloc[0].str.lower()
+    #excluded_ingredients['products'] = excluded_ingredients.iloc[0].str.lower()
+    #food_brands['ingredients'] = food_brands['ingredients'].str.lower()
     
     food_brands['ingredients'] = food_brands['ingredients'].replace("(",",")
     food_brands['ingredients'] = food_brands['ingredients'].replace(")",",")
-    
+
     row_count = 0
     ingredient_count_array = []
     ultimate_ingredients_array = []
     for brand_ingredients in food_brands['ingredients']:
+        print(brand_ingredients)
         ingredient_count = 0
         ingredients_array = []
         try:
             ingredients_list = brand_ingredients.split(",")
             for ingredient in ingredients_list:
                 for target_ingredient in target_ingredients['products']:
-                    if (ingredient.find(target_ingredient) != -1):
+                    print(target_ingredient)
+                    if re.search(target_ingredient, ingredient, re.IGNORECASE):
                         excluded_ingredient_matches = 0
                         for excluded_ingredient in excluded_ingredients['products']:
-                            if (ingredient.find(excluded_ingredient) != -1):
+                            if (re.search(target_ingredient, excluded_ingredient, re.IGNORECASE)):
                                 print('excluded ingredient found! %s' % excluded_ingredient)
                                 excluded_ingredient_matches += 1
                         if (excluded_ingredient_matches == 0):
